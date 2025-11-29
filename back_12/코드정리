@@ -1,0 +1,50 @@
+<a href="/articles/new">New Article</a>
+
+return "redirect:/articles/" + saved.getId();
+
+<a href="/articles/{{article.id}}/edit">Edit</a>
+@GetMapping("/articles/{id}/edit")
+public String edit(@PathVariable Long id, Model model) {
+    Article articleEntity = articleRepository.findById(id).orElse(null);
+    model.addAttribute("article", articleEntity);
+    return "articles/edit";
+}
+
+<form action="/articles/update" method="post">
+<input type="hidden" name="id" value="{{id}}">
+<input type="text" name="title" value="{{title}}">
+<textarea name="content">{{content}}</textarea>
+<button type="submit">Submit</button>
+</form>
+
+
+@PostMapping("/articles/update")
+public String update(ArticleForm form) {
+    Article articleEntity = form.toEntity();
+    Article target = articleRepository.findById(articleEntity.getId()).orElse(null);
+
+    if(target != null) {
+        articleRepository.save(articleEntity);
+    }
+    return "redirect:/articles/" + articleEntity.getId();
+}
+
+<a href="/articles/{{article.id}}/delete" class="btn btn-danger">Delete</a>
+
+@GetMapping("/articles/{id}/delete")
+public String delete(@PathVariable Long id, RedirectAttributes rttr) {
+    Article target = articleRepository.findById(id).orElse(null);
+
+    if(target != null) {
+        articleRepository.delete(target);
+        rttr.addFlashAttribute("msg", "삭제됐습니다!");
+    }
+    return "redirect:/articles";
+}
+
+{{#msg}}
+<div class="alert alert-primary alert-dismissible">
+    {{msg}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{{/msg}}
